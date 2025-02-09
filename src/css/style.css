@@ -21,17 +21,12 @@ canvas {
     display: block;
     background: linear-gradient(
         to bottom,
-        #666 0%,
-        #666 20%,
-        #444 20%,
-        #444 40%,
-        #666 40%,
-        #666 60%,
-        #444 60%,
-        #444 80%,
-        #666 80%,
-        #666 100%
+        #1e90ff 0%,     /* Deeper blue at top */
+        #87CEEB 40%,    /* Sky blue */
+        #E8F3F9 70%,    /* Light blue near horizon */
+        #F5F5F5 100%    /* Almost white at horizon */
     );
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.1); /* Subtle vignette effect */
 }
 
 .character {

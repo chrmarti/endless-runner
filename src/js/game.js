@@ -8,6 +8,8 @@ const MOVEMENT_SPEED = 10; // Speed of lane switching
 const LANE_WIDTH = 100;
 const CHARACTER_HEIGHT = 60;
 const CHARACTER_WIDTH = 30;
+let trackOffset = 0;
+const TRACK_SCROLL_SPEED = 2;
 
 function initializeCanvas() {
     canvas = document.getElementById('gameCanvas');
@@ -66,8 +68,94 @@ function drawRunner() {
     ctx.fill();
 }
 
+function drawTracks() {
+    const horizonY = canvas.height * 0.2;
+    const trackWidth = 40; // Slightly wider tracks
+    const bottomSpacing = canvas.width / 6; // Adjust spacing between tracks
+    const centerX = canvas.width / 2; // Center point reference
+
+    // Draw ground
+    ctx.fillStyle = '#8B7355';
+    ctx.beginPath();
+    ctx.moveTo(0, horizonY);
+    ctx.lineTo(canvas.width, horizonY);
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.lineTo(0, canvas.height);
+    ctx.fill();
+
+    // Draw three parallel tracks
+    for (let i = -1; i <= 1; i++) {
+        const trackCenterX = centerX + (i * bottomSpacing);
+        
+        // Draw track bed (ballast)
+        ctx.beginPath();
+        ctx.moveTo(trackCenterX - trackWidth * 2, canvas.height);
+        ctx.lineTo(trackCenterX - trackWidth * 0.4, horizonY);
+        ctx.lineTo(trackCenterX + trackWidth * 0.4, horizonY);
+        ctx.lineTo(trackCenterX + trackWidth * 2, canvas.height);
+        ctx.fillStyle = '#696969';
+        ctx.fill();
+
+        // Draw sleepers with scrolling effect
+        const numSleepers = 25;
+        for (let j = 0; j < numSleepers; j++) {
+            const progress = (j + trackOffset/50) / numSleepers;
+            const y = canvas.height - progress * (canvas.height - horizonY);
+            if (y > horizonY) {
+                const perspective = 1 - progress * 0.8;
+                const sleeperWidth = trackWidth * 2 * perspective;
+                
+                const woodTone = Math.random() * 20;
+                ctx.strokeStyle = `rgb(${89 + woodTone}, ${49 + woodTone}, ${19 + woodTone})`;
+                ctx.lineWidth = 4 * perspective;
+                
+                ctx.beginPath();
+                ctx.moveTo(trackCenterX - sleeperWidth, y);
+                ctx.lineTo(trackCenterX + sleeperWidth, y);
+                ctx.stroke();
+            }
+        }
+
+        // Draw rails with metallic effect
+        [-1, 1].forEach(railSide => {
+            const railOffset = trackWidth * 0.7 * railSide;
+            const vanishingOffset = trackWidth * 0.15 * railSide;
+            
+            // Base rail
+            ctx.beginPath();
+            ctx.moveTo(trackCenterX + railOffset, canvas.height);
+            ctx.lineTo(trackCenterX + vanishingOffset, horizonY);
+            ctx.strokeStyle = '#2A2A2A';
+            ctx.lineWidth = 5;
+            ctx.stroke();
+
+            // Rail highlight
+            ctx.beginPath();
+            ctx.moveTo(trackCenterX + railOffset, canvas.height);
+            ctx.lineTo(trackCenterX + vanishingOffset, horizonY);
+            ctx.strokeStyle = '#4A4A4A';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        });
+
+        // Draw scrolling gravel
+        for (let k = 0; k < 100; k++) {
+            const xSpread = Math.random() * trackWidth * 3 - trackWidth * 1.5;
+            const yProgress = (k + trackOffset/50) % 1;
+            const y = horizonY + yProgress * (canvas.height - horizonY);
+            const perspective = 1 - ((y - horizonY) / (canvas.height - horizonY));
+            const x = trackCenterX + xSpread * perspective;
+            const size = 2 * (1 - yProgress * 0.5);
+            
+            ctx.fillStyle = Math.random() > 0.5 ? '#7A7A7A' : '#858585';
+            ctx.fillRect(x, y, size, size);
+        }
+    }
+}
+
 function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#e0e0e0';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function startGame() {
@@ -79,12 +167,18 @@ function startGame() {
     gameLoop();
 }
 
-// Start the game when the page loads
-window.addEventListener('load', initializeCanvas);
+// Initialize game state when page loads
+window.addEventListener('load', () => {
+    initializeCanvas();
+    clearCanvas();
+    drawTracks();
+    drawRunner();
+});
 
 function gameLoop() {
     if (!isGameOver) {
         clearCanvas();
+        drawTracks();
         drawRunner();
         updateGame();
         requestAnimationFrame(gameLoop);
@@ -92,10 +186,9 @@ function gameLoop() {
 }
 
 function updateGame() {
-    // Update game state
     if (!isGameOver) {
-        // Basic game state updates will go here
-        // This keeps the game loop active
+        // Update track scroll position
+        trackOffset = (trackOffset + TRACK_SCROLL_SPEED) % 50;
         score += 0.1;
         document.getElementById('score').textContent = `Score: ${Math.floor(score)}`;
     }
