@@ -97,3 +97,21 @@ document.addEventListener('swipeleft', () => switchLane('left'));
 document.addEventListener('swiperight', () => switchLane('right'));
 document.addEventListener('swipeup', jump);
 document.addEventListener('swipedown', slide);
+
+// Event listeners for keyboard controls
+document.addEventListener('keydown', (event) => {
+    switch(event.key) {
+        case 'ArrowLeft':
+            switchLane('left');
+            break;
+        case 'ArrowRight':
+            switchLane('right');
+            break;
+        case 'ArrowUp':
+            jump();
+            break;
+        case 'ArrowDown':
+            slide();
+            break;
+    }
+});
