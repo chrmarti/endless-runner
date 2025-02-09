@@ -2,6 +2,9 @@ let canvas, ctx;
 let score = 0;
 let isGameOver = false;
 let characterPosition = 1; // 0: left lane, 1: middle lane, 2: right lane
+let targetPosition = 1; // Target lane for smooth movement
+let currentX = 0; // Current X position for smooth animation
+const MOVEMENT_SPEED = 10; // Speed of lane switching
 const LANE_WIDTH = 100;
 const CHARACTER_HEIGHT = 60;
 const CHARACTER_WIDTH = 30;
@@ -14,27 +17,41 @@ function initializeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     
+    // Set initial currentX position
+    currentX = canvas.width / 2;
+    
     // Add window resize handler
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        // Update currentX on resize
+        currentX = canvas.width / 2 + (targetPosition - 1) * LANE_WIDTH;
     });
 }
 
 function drawRunner() {
     const centerX = canvas.width / 2;
     const y = canvas.height - 100; // Fixed Y position near bottom
-    const x = centerX + (characterPosition - 1) * LANE_WIDTH;
+    
+    // Calculate the target x position
+    const targetX = centerX + (targetPosition - 1) * LANE_WIDTH;
+    
+    // Smooth movement
+    if (currentX < targetX) {
+        currentX = Math.min(currentX + MOVEMENT_SPEED, targetX);
+    } else if (currentX > targetX) {
+        currentX = Math.max(currentX - MOVEMENT_SPEED, targetX);
+    }
 
-    // Draw runner
+    // Draw runner at currentX instead of calculated position
     ctx.fillStyle = '#333';
     
     // Body
-    ctx.fillRect(x - CHARACTER_WIDTH/2, y - CHARACTER_HEIGHT, CHARACTER_WIDTH, CHARACTER_HEIGHT);
+    ctx.fillRect(currentX - CHARACTER_WIDTH/2, y - CHARACTER_HEIGHT, CHARACTER_WIDTH, CHARACTER_HEIGHT);
     
     // Head
     ctx.beginPath();
-    ctx.arc(x, y - CHARACTER_HEIGHT - 15, 10, 0, Math.PI * 2);
+    ctx.arc(currentX, y - CHARACTER_HEIGHT - 15, 10, 0, Math.PI * 2);
     ctx.fill();
     
     // Legs in running position (alternating)
@@ -42,9 +59,9 @@ function drawRunner() {
     const legSpread = Math.sin(time) * 15;
     
     ctx.beginPath();
-    ctx.moveTo(x, y - CHARACTER_HEIGHT + 10);
-    ctx.lineTo(x - legSpread, y);
-    ctx.lineTo(x + legSpread, y);
+    ctx.moveTo(currentX, y - CHARACTER_HEIGHT + 10);
+    ctx.lineTo(currentX - legSpread, y);
+    ctx.lineTo(currentX + legSpread, y);
     ctx.closePath();
     ctx.fill();
 }
@@ -54,9 +71,16 @@ function clearCanvas() {
 }
 
 function startGame() {
+    isGameOver = false;
+    score = 0;
+    // Hide the start button
+    document.getElementById('startButton').style.display = 'none';
     initializeCanvas();
     gameLoop();
 }
+
+// Start the game when the page loads
+window.addEventListener('load', initializeCanvas);
 
 function gameLoop() {
     if (!isGameOver) {
@@ -64,6 +88,16 @@ function gameLoop() {
         drawRunner();
         updateGame();
         requestAnimationFrame(gameLoop);
+    }
+}
+
+function updateGame() {
+    // Update game state
+    if (!isGameOver) {
+        // Basic game state updates will go here
+        // This keeps the game loop active
+        score += 0.1;
+        document.getElementById('score').textContent = `Score: ${Math.floor(score)}`;
     }
 }
 
@@ -76,10 +110,10 @@ function slide() {
 }
 
 function switchLane(direction) {
-    if (direction === 'left' && characterPosition > 0) {
-        characterPosition--;
-    } else if (direction === 'right' && characterPosition < 2) {
-        characterPosition++;
+    if (direction === 'left' && targetPosition > 0) {
+        targetPosition--;
+    } else if (direction === 'right' && targetPosition < 2) {
+        targetPosition++;
     }
 }
 
