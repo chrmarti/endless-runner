@@ -1,0 +1,23 @@
+{
+  "name": "endless-runner",
+  "version": "1.0.0",
+  "description": "An endless runner game where players navigate train tracks, avoiding obstacles and collecting coins.",
+  "main": "src/js/game.js",
+  "scripts": {
+    "start": "live-server src",
+    "build": "echo 'Build step not defined'",
+    "test": "echo 'No tests defined'"
+  },
+  "keywords": [
+    "endless-runner",
+    "game",
+    "javascript",
+    "html",
+    "css"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "live-server": "^1.2.1"
+  }
+}
