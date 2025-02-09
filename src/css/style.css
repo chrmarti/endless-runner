@@ -3,6 +3,7 @@ body {
     padding: 0;
     overflow: hidden;
     font-family: 'Arial', sans-serif;
+    background: #333;
 }
 
 canvas {
@@ -10,10 +11,27 @@ canvas {
     background-color: #e0e0e0;
 }
 
-.game-container {
+#game-container {
     position: relative;
-    width: 100%;
+    width: 100vw;
     height: 100vh;
+}
+
+#gameCanvas {
+    display: block;
+    background: linear-gradient(
+        to bottom,
+        #666 0%,
+        #666 20%,
+        #444 20%,
+        #444 40%,
+        #666 40%,
+        #666 60%,
+        #444 60%,
+        #444 80%,
+        #666 80%,
+        #666 100%
+    );
 }
 
 .character {
@@ -42,12 +60,28 @@ canvas {
     background-size: cover;
 }
 
-.score {
+#score {
     position: absolute;
     top: 20px;
     left: 20px;
     font-size: 24px;
-    color: #333;
+    color: white;
+    z-index: 1;
+}
+
+#startButton {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    z-index: 1;
 }
 
 .power-up {
