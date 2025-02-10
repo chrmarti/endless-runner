@@ -321,10 +321,10 @@ function handleTouchMove(event) {
     
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
         if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
-            if (deltaX > 0 && playerPosition < 2) { // Swipe left
+            if (deltaX < 0 && playerPosition < 2) { // Swipe right
                 playerPosition++;
                 targetPosition = playerPosition * LANE_WIDTH;
-            } else if (deltaX < 0 && playerPosition > 0) { // Swipe right
+            } else if (deltaX > 0 && playerPosition > 0) { // Swipe left
                 playerPosition--;
                 targetPosition = playerPosition * LANE_WIDTH;
             }
