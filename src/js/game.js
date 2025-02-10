@@ -127,10 +127,13 @@ function init() {
     updateHighScoresDisplay();
 }
 
-// Move event listeners outside of init
+// Move scene animation start to after init
 window.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing game...');
     init();
+    
+    // Initial render of the scene (just once)
+    renderer.render(scene, camera);
     
     // Handle window resize
     window.addEventListener('resize', onWindowResize, false);
@@ -460,7 +463,10 @@ function jump() {
 }
 
 function updateGame() {
-    if (isGameOver) return;
+    const startButton = document.getElementById('startButton');
+    const gameNotStarted = startButton && startButton.style.display !== 'none';
+    
+    if (gameNotStarted || isGameOver) return;
 
     // Update track position
     track.position.z = (track.position.z + trackSpeed) % 2;
@@ -525,7 +531,16 @@ function updateGame() {
 
 function animate() {
     animationFrameId = requestAnimationFrame(animate);
-    updateGame();
+    
+    const startButton = document.getElementById('startButton');
+    const gameNotStarted = startButton && startButton.style.display !== 'none';
+    
+    // Only update game if it's started and not over
+    if (!gameNotStarted && !isGameOver) {
+        updateGame();
+    }
+    
+    // Always render the scene, but with no movement before game starts
     renderer.render(scene, camera);
 }
 
