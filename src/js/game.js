@@ -15,16 +15,17 @@ let trackSpeed = 0.1; // Reduced speed for more natural motion
 function init() {
     // Create scene
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x87ceeb, 20, 100);
+    scene.fog = new THREE.Fog(0x87ceeb, 30, 120); // Adjusted fog settings
 
     // Create camera
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 3, 10);
-    camera.lookAt(0, 0, -10);
+    camera.position.set(0, 8, 8); // Moved camera higher up and closer
+    camera.lookAt(0, -2, -20); // Adjusted look target to angle down more
 
     // Create renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setClearColor(0x87ceeb); // Sky blue
     renderer.shadowMap.enabled = true;
     document.getElementById('game-container').appendChild(renderer.domElement);
@@ -99,20 +100,20 @@ function createTrack() {
     // Create three lanes
     for (let i = -1; i <= 1; i++) {
         // Create rails
-        const railGeometry = new THREE.BoxGeometry(0.2, 0.1, 100);
+        const railGeometry = new THREE.BoxGeometry(0.2, 0.1, 200); // Doubled length
         const railMaterial = new THREE.MeshPhongMaterial({ color: 0x4a4a4a });
         
         const leftRail = new THREE.Mesh(railGeometry, railMaterial);
         const rightRail = new THREE.Mesh(railGeometry, railMaterial);
         
-        leftRail.position.set(i * LANE_WIDTH - 0.5, 0, -50);
-        rightRail.position.set(i * LANE_WIDTH + 0.5, 0, -50);
+        leftRail.position.set(i * LANE_WIDTH - 0.5, 0, -100); // Adjusted z-position
+        rightRail.position.set(i * LANE_WIDTH + 0.5, 0, -100); // Adjusted z-position
         
         track.add(leftRail);
         track.add(rightRail);
 
         // Create sleepers
-        for (let j = 0; j < 50; j++) {
+        for (let j = 0; j < 100; j++) { // Doubled number of sleepers
             const sleeperGeometry = new THREE.BoxGeometry(2, 0.1, 0.4);
             const sleeperMaterial = new THREE.MeshPhongMaterial({ color: 0x5c4033 });
             const sleeper = new THREE.Mesh(sleeperGeometry, sleeperMaterial);
@@ -129,6 +130,7 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
 }
 
 function handleKeyDown(event) {
