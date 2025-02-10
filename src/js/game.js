@@ -70,9 +70,16 @@ function init() {
     // Add event listeners
     document.addEventListener('keydown', handleKeyDown);
 
-    // Add touch event listeners
-    document.addEventListener('touchstart', handleTouchStart, false);
-    document.addEventListener('touchmove', handleTouchMove, false);
+    // Update touch event listeners
+    const gameContainer = document.getElementById('game-container');
+    gameContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+    gameContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+    gameContainer.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    // Prevent elastic scrolling on iOS
+    document.body.addEventListener('touchmove', function(event) {
+        event.preventDefault();
+    }, { passive: false });
 }
 
 function createEnvironment() {
@@ -297,23 +304,22 @@ function handleKeyDown(event) {
 function handleTouchStart(event) {
     if (isGameOver) return;
     
-    const touch = event.touches[0];
-    touchStartX = touch.clientX;
-    touchStartY = touch.clientY;
+    event.preventDefault(); // Prevent default touch behavior
+    const touch = event.changedTouches[0];
+    touchStartX = touch.pageX;
+    touchStartY = touch.pageY;
 }
 
 function handleTouchMove(event) {
-    if (isGameOver || !touchStartX || !touchStartY) return;
+    if (isGameOver || touchStartX === null || touchStartY === null) return;
     
-    event.preventDefault(); // Prevent scrolling while playing
+    event.preventDefault(); // Prevent scrolling
     
-    const touch = event.touches[0];
-    const deltaX = touchStartX - touch.clientX;
-    const deltaY = touchStartY - touch.clientY;
+    const touch = event.changedTouches[0];
+    const deltaX = touchStartX - touch.pageX;
+    const deltaY = touchStartY - touch.pageY;
     
-    // Check if horizontal swipe is stronger than vertical
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Horizontal swipe
         if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
             if (deltaX > 0 && playerPosition < 2) { // Swipe left
                 playerPosition++;
@@ -323,18 +329,14 @@ function handleTouchMove(event) {
                 targetPosition = playerPosition * LANE_WIDTH;
             }
         }
-    } else {
-        // Vertical swipe
-        if (Math.abs(deltaY) > SWIPE_THRESHOLD) {
-            if (deltaY > 0 && !jumpAnimation) { // Swipe up
-                jump();
-            }
-        }
+    } else if (deltaY > SWIPE_THRESHOLD && !jumpAnimation) { // Swipe up
+        jump();
     }
-    
-    // Reset touch coordinates
-    touchStartX = 0;
-    touchStartY = 0;
+}
+
+function handleTouchEnd(event) {
+    touchStartX = null;
+    touchStartY = null;
 }
 
 function jump() {
