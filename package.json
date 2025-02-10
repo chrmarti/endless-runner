@@ -4,20 +4,23 @@
   "description": "An endless runner game where players navigate train tracks, avoiding obstacles and collecting coins.",
   "main": "src/js/game.js",
   "scripts": {
-    "start": "live-server src",
-    "build": "echo 'Build step not defined'",
-    "test": "echo 'No tests defined'"
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "keywords": [
     "endless-runner",
     "game",
     "javascript",
-    "html",
-    "css"
+    "three.js",
+    "3d"
   ],
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "live-server": "^1.2.1"
+    "three": "^0.157.0"
+  },
+  "devDependencies": {
+    "vite": "^4.5.0"
   }
 }

@@ -52,27 +52,35 @@ canvas {
 }
 
 #score {
-    position: absolute;
+    position: fixed;
     top: 20px;
     left: 20px;
     font-size: 24px;
     color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     z-index: 1;
 }
 
 #startButton {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 10px 20px;
-    font-size: 18px;
+    padding: 15px 30px;
+    font-size: 20px;
     cursor: pointer;
     background: #4CAF50;
     color: white;
     border: none;
     border-radius: 5px;
     z-index: 1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+#startButton:hover {
+    background: #45a049;
+    transform: translate(-50%, -50%) scale(1.05);
 }
 
 .power-up {
