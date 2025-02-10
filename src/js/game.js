@@ -11,6 +11,12 @@ const MOVEMENT_SPEED = 0.2;
 let jumpAnimation = null;
 let trackSpeed = 0.1; // Reduced speed for more natural motion
 
+// Train-related variables
+let trains = [];
+const TRAIN_SPEED = 0.4;
+const TRAIN_SPAWN_INTERVAL = 3000; // Spawn a new train every 3 seconds
+let lastTrainSpawn = 0;
+
 // Initialize the scene
 function init() {
     // Create scene
@@ -126,6 +132,66 @@ function createTrack() {
     scene.add(track);
 }
 
+function createTrain() {
+    const trainGeometry = new THREE.BoxGeometry(1.5, 2, 4);
+    const trainMaterial = new THREE.MeshPhongMaterial({ color: 0x3366cc });
+    const train = new THREE.Mesh(trainGeometry, trainMaterial);
+    
+    // Random lane selection (0, 1, or 2)
+    const lane = Math.floor(Math.random() * 3);
+    train.position.set((lane - 1) * LANE_WIDTH, 1, -100);
+    train.castShadow = true;
+    train.receiveShadow = true;
+    
+    scene.add(train);
+    trains.push({
+        mesh: train,
+        lane: lane
+    });
+}
+
+function checkCollision(trainObject) {
+    const train = trainObject.mesh;
+    const playerBoundingBox = new THREE.Box3().setFromObject(player);
+    const trainBoundingBox = new THREE.Box3().setFromObject(train);
+    
+    return playerBoundingBox.intersectsBox(trainBoundingBox);
+}
+
+function gameOver() {
+    isGameOver = true;
+    document.getElementById('startButton').style.display = 'block';
+    document.getElementById('startButton').textContent = 'Game Over - Try Again';
+}
+
+function updateTrains() {
+    const currentTime = Date.now();
+    
+    // Spawn new trains
+    if (currentTime - lastTrainSpawn > TRAIN_SPAWN_INTERVAL) {
+        createTrain();
+        lastTrainSpawn = currentTime;
+    }
+    
+    // Update train positions and check collisions
+    for (let i = trains.length - 1; i >= 0; i--) {
+        const train = trains[i];
+        train.mesh.position.z += TRAIN_SPEED;
+        
+        // Check for collision
+        if (checkCollision(train)) {
+            gameOver();
+            return;
+        }
+        
+        // Remove trains that have passed the player
+        if (train.mesh.position.z > 10) {
+            scene.remove(train.mesh);
+            trains.splice(i, 1);
+        }
+    }
+}
+
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -194,6 +260,9 @@ function updateGame() {
         jumpAnimation = null;
     }
 
+    // Update trains
+    updateTrains();
+
     // Update score
     score += 0.1;
     document.getElementById('score').textContent = `Score: ${Math.floor(score)}`;
@@ -210,10 +279,17 @@ function animate() {
 
 // Initialize and start the game
 function startGame() {
+    // Remove any existing trains
+    trains.forEach(train => {
+        scene.remove(train.mesh);
+    });
+    trains = [];
+
     isGameOver = false;
     score = 0;
     playerPosition = 1;
     targetPosition = LANE_WIDTH;
+    lastTrainSpawn = Date.now();
     document.getElementById('startButton').style.display = 'none';
     animate();
 }
