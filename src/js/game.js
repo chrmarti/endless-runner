@@ -27,6 +27,11 @@ let animationFrameId = null;
 let isRidingTrain = false;
 let currentTrain = null;
 
+// Add these variables near the other game state variables at the top
+let touchStartX = 0;
+let touchStartY = 0;
+const SWIPE_THRESHOLD = 50; // Minimum distance for a swipe
+
 // Initialize the scene
 function init() {
     // Create scene
@@ -64,6 +69,10 @@ function init() {
 
     // Add event listeners
     document.addEventListener('keydown', handleKeyDown);
+
+    // Add touch event listeners
+    document.addEventListener('touchstart', handleTouchStart, false);
+    document.addEventListener('touchmove', handleTouchMove, false);
 }
 
 function createEnvironment() {
@@ -283,6 +292,49 @@ function handleKeyDown(event) {
             if (!jumpAnimation) jump();
             break;
     }
+}
+
+function handleTouchStart(event) {
+    if (isGameOver) return;
+    
+    const touch = event.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+}
+
+function handleTouchMove(event) {
+    if (isGameOver || !touchStartX || !touchStartY) return;
+    
+    event.preventDefault(); // Prevent scrolling while playing
+    
+    const touch = event.touches[0];
+    const deltaX = touchStartX - touch.clientX;
+    const deltaY = touchStartY - touch.clientY;
+    
+    // Check if horizontal swipe is stronger than vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal swipe
+        if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
+            if (deltaX > 0 && playerPosition < 2) { // Swipe left
+                playerPosition++;
+                targetPosition = playerPosition * LANE_WIDTH;
+            } else if (deltaX < 0 && playerPosition > 0) { // Swipe right
+                playerPosition--;
+                targetPosition = playerPosition * LANE_WIDTH;
+            }
+        }
+    } else {
+        // Vertical swipe
+        if (Math.abs(deltaY) > SWIPE_THRESHOLD) {
+            if (deltaY > 0 && !jumpAnimation) { // Swipe up
+                jump();
+            }
+        }
+    }
+    
+    // Reset touch coordinates
+    touchStartX = 0;
+    touchStartY = 0;
 }
 
 function jump() {
