@@ -9,7 +9,7 @@ let targetPosition = 1;
 const LANE_WIDTH = 4;
 const MOVEMENT_SPEED = 0.2;
 let jumpAnimation = null;
-let trackSpeed = 0.2;
+let trackSpeed = 0.1; // Reduced speed for more natural motion
 
 // Initialize the scene
 function init() {
@@ -197,7 +197,7 @@ function updateGame() {
     document.getElementById('score').textContent = `Score: ${Math.floor(score)}`;
 
     // Increase difficulty
-    trackSpeed = 0.2 + (score / 1000);
+    trackSpeed = 0.1 + (score / 2000); // Adjusted difficulty scaling
 }
 
 function animate() {
