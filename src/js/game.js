@@ -13,7 +13,8 @@ let trackSpeed = 0.1; // Reduced speed for more natural motion
 
 // Train-related variables
 let trains = [];
-const TRAIN_SPEED = 0.4;
+const INITIAL_TRAIN_SPEED = 0.4;
+let trainSpeed = INITIAL_TRAIN_SPEED;
 const TRAIN_SPAWN_INTERVAL = 3000; // Spawn a new train every 3 seconds
 let lastTrainSpawn = 0;
 
@@ -176,7 +177,7 @@ function updateTrains() {
     // Update train positions and check collisions
     for (let i = trains.length - 1; i >= 0; i--) {
         const train = trains[i];
-        train.mesh.position.z += TRAIN_SPEED;
+        train.mesh.position.z += trainSpeed;
         
         // Check for collision
         if (checkCollision(train)) {
@@ -269,6 +270,7 @@ function updateGame() {
 
     // Increase difficulty
     trackSpeed = 0.1 + (score / 2000); // Adjusted difficulty scaling
+    trainSpeed = INITIAL_TRAIN_SPEED + (score / 1500); // Trains speed up slightly faster than track
 }
 
 function animate() {
@@ -285,17 +287,33 @@ function startGame() {
     });
     trains = [];
 
-    isGameOver = false;
-    score = 0;
+    // Reset player position
+    player.position.set(0, 0.5, 0);
     playerPosition = 1;
     targetPosition = LANE_WIDTH;
+
+    // Reset track
+    track.position.z = 0;
+    
+    // Reset game state and speeds
+    isGameOver = false;
+    score = 0;
+    trackSpeed = 0.1; // Reset to initial track speed
+    trainSpeed = INITIAL_TRAIN_SPEED; // Reset to initial train speed
+    jumpAnimation = null;
     lastTrainSpawn = Date.now();
+    
     document.getElementById('startButton').style.display = 'none';
+    document.getElementById('score').textContent = 'Score: 0';
+    
+    // Start game loop
     animate();
 }
 
 // Setup event listeners
 document.getElementById('startButton').addEventListener('click', () => {
-    init();
+    if (!scene) {
+        init();
+    }
     startGame();
 });
