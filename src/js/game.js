@@ -23,6 +23,10 @@ const WAGON_GAP = 4.5; // Gap between wagons
 // Add this near the other game state variables at the top
 let animationFrameId = null;
 
+// Add these variables near other game state variables
+let isRidingTrain = false;
+let currentTrain = null;
+
 // Initialize the scene
 function init() {
     // Create scene
@@ -179,7 +183,39 @@ function checkCollision(trainObject) {
     const playerBoundingBox = new THREE.Box3().setFromObject(player);
     const trainBoundingBox = new THREE.Box3().setFromObject(train);
     
-    return playerBoundingBox.intersectsBox(trainBoundingBox);
+    // Check if player is above the train and falling down (during jump)
+    if (player.position.y > 2 && jumpAnimation) {
+        const horizontalIntersect = 
+            player.position.x >= train.position.x - 0.75 && 
+            player.position.x <= train.position.x + 0.75;
+        const verticalIntersect = 
+            player.position.z >= train.position.z - 2 && 
+            player.position.z <= train.position.z + WAGON_COUNT * WAGON_GAP;
+        
+        if (horizontalIntersect && verticalIntersect) {
+            // Land on the train
+            isRidingTrain = true;
+            currentTrain = trainObject;
+            player.position.y = 2.5; // Position player on top of train
+            if (jumpAnimation) jumpAnimation = null; // Cancel jump animation
+            return false;
+        }
+    }
+    
+    // Only check for side/front collisions if not riding a train
+    if (!isRidingTrain) {
+        // Adjust collision box for train to not include the top
+        const trainTopY = train.position.y + 2;  // Height of train
+        const playerBottomY = player.position.y - 0.5;  // Bottom of player
+        
+        if (playerBottomY >= trainTopY) {
+            return false; // Player is above train, no collision
+        }
+        
+        return playerBoundingBox.intersectsBox(trainBoundingBox);
+    }
+    
+    return false;
 }
 
 function gameOver() {
@@ -250,7 +286,9 @@ function handleKeyDown(event) {
 }
 
 function jump() {
-    const jumpHeight = 2;
+    if (isRidingTrain && jumpAnimation) return; // Prevent double jumping from train
+    
+    const jumpHeight = isRidingTrain ? 3 : 2; // Higher jump from train
     const jumpDuration = 500;
     const startTime = Date.now();
     const startY = player.position.y;
@@ -262,9 +300,15 @@ function jump() {
         if (progress < 1) {
             const height = Math.sin(progress * Math.PI) * jumpHeight;
             player.position.y = startY + height;
+            
+            // If jumping off train, release from train at peak of jump
+            if (isRidingTrain && progress > 0.5) {
+                isRidingTrain = false;
+                currentTrain = null;
+            }
             return true;
         } else {
-            player.position.y = startY;
+            player.position.y = isRidingTrain ? 2.5 : 0.5; // Land on train or ground
             return false;
         }
     };
@@ -276,11 +320,47 @@ function updateGame() {
     // Update track position
     track.position.z = (track.position.z + trackSpeed) % 2;
 
-    // Update player horizontal position
-    if (player.position.x < targetPosition - LANE_WIDTH) {
-        player.position.x += MOVEMENT_SPEED;
-    } else if (player.position.x > targetPosition - LANE_WIDTH) {
-        player.position.x -= MOVEMENT_SPEED;
+    // Update player position based on train riding status
+    if (isRidingTrain && currentTrain) {
+        // Check if train has moved too far forward
+        if (currentTrain.mesh.position.z > 3) { // Reduced from 5 to 3 for earlier dismount
+            // Make player fall off with a small jump animation
+            isRidingTrain = false;
+            currentTrain = null;
+            
+            // Create a small falling animation
+            const fallStartTime = Date.now();
+            const fallDuration = 300;
+            const startY = player.position.y;
+            
+            jumpAnimation = function() {
+                const elapsed = Date.now() - fallStartTime;
+                const progress = elapsed / fallDuration;
+
+                if (progress < 1) {
+                    player.position.y = startY * (1 - progress) + 0.5 * progress;
+                    player.position.z = Math.max(0, player.position.z - trainSpeed * 2);
+                    return true;
+                } else {
+                    player.position.y = 0.5;
+                    player.position.z = 0;
+                    return false;
+                }
+            };
+        } else {
+            // Move with the train
+            player.position.z = currentTrain.mesh.position.z;
+            player.position.x = currentTrain.mesh.position.x;
+        }
+    } else {
+        // Normal ground movement
+        if (player.position.x < targetPosition - LANE_WIDTH) {
+            player.position.x += MOVEMENT_SPEED;
+        } else if (player.position.x > targetPosition - LANE_WIDTH) {
+            player.position.x -= MOVEMENT_SPEED;
+        }
+        // Keep player at the game's focal point when not on train
+        player.position.z = 0;
     }
 
     // Update jump animation
@@ -296,8 +376,8 @@ function updateGame() {
     document.getElementById('score').textContent = `Score: ${Math.floor(score)}`;
 
     // Increase difficulty
-    trackSpeed = 0.1 + (score / 2000); // Adjusted difficulty scaling
-    trainSpeed = INITIAL_TRAIN_SPEED + (score / 1500); // Trains speed up slightly faster than track
+    trackSpeed = 0.1 + (score / 2000);
+    trainSpeed = INITIAL_TRAIN_SPEED + (score / 1500);
 }
 
 function animate() {
@@ -336,6 +416,8 @@ function startGame() {
     trainSpeed = INITIAL_TRAIN_SPEED; // Reset to initial train speed
     jumpAnimation = null;
     lastTrainSpawn = Date.now();
+    isRidingTrain = false;
+    currentTrain = null;
     
     document.getElementById('startButton').style.display = 'none';
     
