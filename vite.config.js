@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   root: 'src',
+  base: '/endless-runner/',
   publicDir: 'assets',
   server: {
     open: true,
@@ -10,6 +11,7 @@ export default defineConfig({
   build: {
     outDir: '../dist',
     emptyOutDir: true,
-    sourcemap: true
+    sourcemap: true,
+    copyPublicDir: true
   }
 });
