@@ -34,6 +34,39 @@ const SWIPE_THRESHOLD = 50; // Minimum distance for a swipe
 let lastSwipeTime = 0;
 const SWIPE_COOLDOWN = 200; // Minimum time (ms) between swipes
 
+// Add these functions near the top of the file
+function getHighScores() {
+    const scores = localStorage.getItem('highScores');
+    return scores ? JSON.parse(scores) : [];
+}
+
+function saveHighScore(score) {
+    const scores = getHighScores();
+    const finalScore = Math.floor(score);
+    
+    // Add new score and sort
+    scores.push(finalScore);
+    scores.sort((a, b) => b - a);
+    
+    // Keep only top 5
+    const topScores = scores.slice(0, 5);
+    
+    // Save to localStorage
+    localStorage.setItem('highScores', JSON.stringify(topScores));
+    
+    // Update display
+    updateHighScoresDisplay();
+}
+
+function updateHighScoresDisplay() {
+    const highScoresList = document.getElementById('high-scores-list');
+    const scores = getHighScores();
+    
+    highScoresList.innerHTML = scores
+        .map(score => `<li>${score}</li>`)
+        .join('');
+}
+
 // Initialize the scene
 function init() {
     // Create scene
@@ -82,6 +115,9 @@ function init() {
     document.body.addEventListener('touchmove', function(event) {
         event.preventDefault();
     }, { passive: false });
+
+    // Initialize high scores display
+    updateHighScoresDisplay();
 }
 
 function createEnvironment() {
@@ -242,6 +278,7 @@ function gameOver() {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
     }
+    saveHighScore(score);
     document.getElementById('startButton').style.display = 'block';
     document.getElementById('startButton').textContent = 'Game Over - Try Again';
 }
@@ -482,6 +519,7 @@ function startGame() {
     document.getElementById('startButton').style.display = 'none';
     
     // Start game loop
+    updateHighScoresDisplay();
     animate();
 }
 

@@ -107,6 +107,35 @@ canvas {
     background-size: cover;
 }
 
+#high-scores {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    font-family: Arial, sans-serif;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    min-width: 200px;
+}
+
+#high-scores h2 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    text-align: center;
+}
+
+#high-scores-list {
+    margin: 0;
+    padding-left: 25px;
+}
+
+#high-scores-list li {
+    margin-bottom: 5px;
+}
+
 @media (max-width: 768px) {
     #score {
         font-size: 20px;
