@@ -44,18 +44,26 @@ function saveHighScore(score) {
     const scores = getHighScores();
     const finalScore = Math.floor(score);
     
-    // Add new score and sort
-    scores.push(finalScore);
-    scores.sort((a, b) => b - a);
-    
-    // Keep only top 5
-    const topScores = scores.slice(0, 5);
-    
-    // Save to localStorage
-    localStorage.setItem('highScores', JSON.stringify(topScores));
-    
-    // Update display
-    updateHighScoresDisplay();
+    // Only ask for name if score is high enough
+    if (scores.length < 5 || finalScore > scores[scores.length - 1].score) {
+        let name = prompt('You got a high score! Enter your name (max 6 characters):');
+        if (name) {
+            name = name.slice(0, 6).toUpperCase();
+            
+            // Add new score and sort
+            scores.push({ name, score: finalScore });
+            scores.sort((a, b) => b.score - a.score);
+            
+            // Keep only top 5
+            const topScores = scores.slice(0, 5);
+            
+            // Save to localStorage
+            localStorage.setItem('highScores', JSON.stringify(topScores));
+            
+            // Update display
+            updateHighScoresDisplay();
+        }
+    }
 }
 
 function updateHighScoresDisplay() {
@@ -63,7 +71,11 @@ function updateHighScoresDisplay() {
     const scores = getHighScores();
     
     highScoresList.innerHTML = scores
-        .map(score => `<li>${score}</li>`)
+        .map(entry => `
+            <li class="high-score-entry">
+                <span class="high-score-name">${entry.name}</span>
+                <span class="high-score-value">${entry.score.toString().padStart(6)}</span>
+            </li>`)
         .join('');
 }
 
@@ -99,13 +111,22 @@ function init() {
     createPlayer();
     createTrack();
 
+    // Initialize high scores display
+    updateHighScoresDisplay();
+}
+
+// Move event listeners outside of init
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing game...');
+    init();
+    
     // Handle window resize
     window.addEventListener('resize', onWindowResize, false);
 
-    // Add event listeners
+    // Add keyboard controls
     document.addEventListener('keydown', handleKeyDown);
 
-    // Update touch event listeners
+    // Add touch controls
     const gameContainer = document.getElementById('game-container');
     gameContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
     gameContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -116,9 +137,17 @@ function init() {
         event.preventDefault();
     }, { passive: false });
 
-    // Initialize high scores display
-    updateHighScoresDisplay();
-}
+    // Add start button listener
+    const startButton = document.getElementById('startButton');
+    if (startButton) {
+        startButton.addEventListener('click', () => {
+            console.log('Start button clicked');
+            startGame();
+        });
+    } else {
+        console.error('Start button not found');
+    }
+});
 
 function createEnvironment() {
     // Create mountains
@@ -522,11 +551,3 @@ function startGame() {
     updateHighScoresDisplay();
     animate();
 }
-
-// Setup event listeners
-document.getElementById('startButton').addEventListener('click', () => {
-    if (!scene) {
-        init();
-    }
-    startGame();
-});

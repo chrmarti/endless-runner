@@ -118,7 +118,7 @@ canvas {
     background: rgba(0, 0, 0, 0.5);
     padding: 15px;
     border-radius: 8px;
-    min-width: 200px;
+    min-width: 250px;
 }
 
 #high-scores h2 {
@@ -129,7 +129,23 @@ canvas {
 
 #high-scores-list {
     margin: 0;
-    padding-left: 25px;
+    padding: 0;
+    list-style: none;
+}
+
+.high-score-entry {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-family: monospace;
+}
+
+.high-score-name {
+    text-transform: uppercase;
+}
+
+.high-score-value {
+    text-align: right;
 }
 
 #high-scores-list li {
