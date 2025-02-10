@@ -111,7 +111,8 @@ function drawTracks() {
         // Draw sleepers with improved perspective
         const numSleepers = 25;
         for (let j = 0; j < numSleepers; j++) {
-            const progress = (j + trackOffset/50) / numSleepers;
+            // Reverse the progress calculation to make sleepers move towards the player
+            const progress = (numSleepers - (j + trackOffset/50)) / numSleepers;
             const y = canvas.height - progress * (canvas.height - vanishingPointY);
             
             if (y > vanishingPointY) {
