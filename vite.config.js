@@ -4,10 +4,12 @@ export default defineConfig({
   root: 'src',
   publicDir: 'assets',
   server: {
-    open: true
+    open: true,
+    sourcemap: true
   },
   build: {
     outDir: '../dist',
-    emptyOutDir: true
+    emptyOutDir: true,
+    sourcemap: true
   }
 });

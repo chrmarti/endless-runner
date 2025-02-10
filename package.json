@@ -4,6 +4,7 @@
   "description": "An endless runner game where players navigate train tracks, avoiding obstacles and collecting coins.",
   "main": "src/js/game.js",
   "scripts": {
+    "dev": "vite",
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview"
