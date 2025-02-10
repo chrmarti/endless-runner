@@ -36,8 +36,19 @@ const SWIPE_COOLDOWN = 200; // Minimum time (ms) between swipes
 
 // Add these functions near the top of the file
 function getHighScores() {
-    const scores = localStorage.getItem('highScores');
-    return scores ? JSON.parse(scores) : [];
+    const scores = localStorage.getItem('highScores_v2');
+    if (!scores) {
+        const defaultScores = [
+            { name: 'SPEEDY', score: 500 },
+            { name: 'ZOOMER', score: 400 },
+            { name: 'RUNNER', score: 300 },
+            { name: 'DODGE', score: 200 },
+            { name: 'CHOO', score: 100 }
+        ];
+        localStorage.setItem('highScores_v2', JSON.stringify(defaultScores));
+        return defaultScores;
+    }
+    return JSON.parse(scores);
 }
 
 function saveHighScore(score) {
@@ -58,7 +69,7 @@ function saveHighScore(score) {
             const topScores = scores.slice(0, 5);
             
             // Save to localStorage
-            localStorage.setItem('highScores', JSON.stringify(topScores));
+            localStorage.setItem('highScores_v2', JSON.stringify(topScores));
             
             // Update display
             updateHighScoresDisplay();
