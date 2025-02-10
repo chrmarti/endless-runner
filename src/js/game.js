@@ -339,17 +339,14 @@ function updateGame() {
 
                 if (progress < 1) {
                     player.position.y = startY * (1 - progress) + 0.5 * progress;
-                    player.position.z = Math.max(0, player.position.z - trainSpeed * 2);
                     return true;
                 } else {
                     player.position.y = 0.5;
-                    player.position.z = 0;
                     return false;
                 }
             };
         } else {
-            // Move with the train
-            player.position.z = currentTrain.mesh.position.z;
+            // Move with the train horizontally only
             player.position.x = currentTrain.mesh.position.x;
         }
     } else {
@@ -359,9 +356,10 @@ function updateGame() {
         } else if (player.position.x > targetPosition - LANE_WIDTH) {
             player.position.x -= MOVEMENT_SPEED;
         }
-        // Keep player at the game's focal point when not on train
-        player.position.z = 0;
     }
+
+    // Keep player at the game's focal point
+    player.position.z = 0;
 
     // Update jump animation
     if (jumpAnimation && !jumpAnimation()) {
