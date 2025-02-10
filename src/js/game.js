@@ -245,14 +245,14 @@ function drawMountainLayer(baseY, color, heightFactor) {
     ctx.beginPath();
     ctx.moveTo(0, baseY);
     
-    // Smoother, more natural mountain silhouette
+    // Smoother, more natural mountain silhouette without movement
     const points = 30;
     for(let i = 0; i <= points; i++) {
         const x = (canvas.width * i) / points;
-        // Compound sine waves for organic shape
-        const variance = Math.sin(i * 0.5 + trackOffset/20) * 0.7 + 
-                        Math.sin(i * 0.7 + trackOffset/15) * 0.5 +
-                        Math.sin(i * 0.3 + trackOffset/25) * 0.3;
+        // Remove trackOffset from sine calculations to keep mountains static
+        const variance = Math.sin(i * 0.5) * 0.7 + 
+                        Math.sin(i * 0.7) * 0.5 +
+                        Math.sin(i * 0.3) * 0.3;
         const height = variance * canvas.height * heightFactor;
         ctx.lineTo(x, baseY - Math.abs(height));
     }
