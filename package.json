@@ -15,7 +15,7 @@
     "three.js",
     "3d"
   ],
-  "author": "Your Name",
+  "author": "Christof Marti",
   "license": "MIT",
   "dependencies": {
     "three": "^0.173.0"
