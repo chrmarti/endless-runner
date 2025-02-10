@@ -17,6 +17,8 @@ const INITIAL_TRAIN_SPEED = 0.4;
 let trainSpeed = INITIAL_TRAIN_SPEED;
 const TRAIN_SPAWN_INTERVAL = 3000; // Spawn a new train every 3 seconds
 let lastTrainSpawn = 0;
+const WAGON_COUNT = 3; // Number of wagons per train
+const WAGON_GAP = 4.5; // Gap between wagons
 
 // Add this near the other game state variables at the top
 let animationFrameId = null;
@@ -137,19 +139,37 @@ function createTrack() {
 }
 
 function createTrain() {
-    const trainGeometry = new THREE.BoxGeometry(1.5, 2, 4);
-    const trainMaterial = new THREE.MeshPhongMaterial({ color: 0x3366cc });
-    const train = new THREE.Mesh(trainGeometry, trainMaterial);
+    const trainGroup = new THREE.Group();
     
     // Random lane selection (0, 1, or 2)
     const lane = Math.floor(Math.random() * 3);
-    train.position.set((lane - 1) * LANE_WIDTH, 1, -100);
-    train.castShadow = true;
-    train.receiveShadow = true;
+    const xPosition = (lane - 1) * LANE_WIDTH;
     
-    scene.add(train);
+    // Create locomotive (first wagon)
+    const locomotiveGeometry = new THREE.BoxGeometry(1.5, 2, 4);
+    const locomotiveMaterial = new THREE.MeshPhongMaterial({ color: 0x3366cc });
+    const locomotive = new THREE.Mesh(locomotiveGeometry, locomotiveMaterial);
+    locomotive.position.set(0, 1, 0);
+    locomotive.castShadow = true;
+    locomotive.receiveShadow = true;
+    trainGroup.add(locomotive);
+    
+    // Create additional wagons
+    for (let i = 1; i < WAGON_COUNT; i++) {
+        const wagonGeometry = new THREE.BoxGeometry(1.5, 1.8, 4);
+        const wagonMaterial = new THREE.MeshPhongMaterial({ color: 0x2255aa });
+        const wagon = new THREE.Mesh(wagonGeometry, wagonMaterial);
+        wagon.position.set(0, 1, i * WAGON_GAP); // Position each wagon behind the previous one
+        wagon.castShadow = true;
+        wagon.receiveShadow = true;
+        trainGroup.add(wagon);
+    }
+    
+    trainGroup.position.set(xPosition, 0, -100);
+    scene.add(trainGroup);
+    
     trains.push({
-        mesh: train,
+        mesh: trainGroup,
         lane: lane
     });
 }
