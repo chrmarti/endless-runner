@@ -137,13 +137,17 @@ window.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
     }, { passive: false });
 
-    // Add start button listener
+    // Add start button listeners for both click and touch
     const startButton = document.getElementById('startButton');
     if (startButton) {
-        startButton.addEventListener('click', () => {
-            console.log('Start button clicked');
+        const startGameHandler = (event) => {
+            event.preventDefault();  // Prevent any default behavior
+            console.log('Start button clicked/touched');
             startGame();
-        });
+        };
+        
+        startButton.addEventListener('click', startGameHandler);
+        startButton.addEventListener('touchend', startGameHandler);
     } else {
         console.error('Start button not found');
     }
