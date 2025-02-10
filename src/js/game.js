@@ -18,6 +18,9 @@ let trainSpeed = INITIAL_TRAIN_SPEED;
 const TRAIN_SPAWN_INTERVAL = 3000; // Spawn a new train every 3 seconds
 let lastTrainSpawn = 0;
 
+// Add this near the other game state variables at the top
+let animationFrameId = null;
+
 // Initialize the scene
 function init() {
     // Create scene
@@ -161,6 +164,10 @@ function checkCollision(trainObject) {
 
 function gameOver() {
     isGameOver = true;
+    if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
     document.getElementById('startButton').style.display = 'block';
     document.getElementById('startButton').textContent = 'Game Over - Try Again';
 }
@@ -274,13 +281,19 @@ function updateGame() {
 }
 
 function animate() {
-    requestAnimationFrame(animate);
+    animationFrameId = requestAnimationFrame(animate);
     updateGame();
     renderer.render(scene, camera);
 }
 
 // Initialize and start the game
 function startGame() {
+    // Cancel any existing animation loop
+    if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
+
     // Remove any existing trains
     trains.forEach(train => {
         scene.remove(train.mesh);
@@ -298,13 +311,13 @@ function startGame() {
     // Reset game state and speeds
     isGameOver = false;
     score = 0;
+    document.getElementById('score').textContent = `Score: ${Math.floor(score)}`; // Ensure score display is reset
     trackSpeed = 0.1; // Reset to initial track speed
     trainSpeed = INITIAL_TRAIN_SPEED; // Reset to initial train speed
     jumpAnimation = null;
     lastTrainSpawn = Date.now();
     
     document.getElementById('startButton').style.display = 'none';
-    document.getElementById('score').textContent = 'Score: 0';
     
     // Start game loop
     animate();
