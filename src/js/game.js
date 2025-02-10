@@ -31,6 +31,8 @@ let currentTrain = null;
 let touchStartX = 0;
 let touchStartY = 0;
 const SWIPE_THRESHOLD = 50; // Minimum distance for a swipe
+let lastSwipeTime = 0;
+const SWIPE_COOLDOWN = 200; // Minimum time (ms) between swipes
 
 // Initialize the scene
 function init() {
@@ -315,22 +317,28 @@ function handleTouchMove(event) {
     
     event.preventDefault(); // Prevent scrolling
     
+    const currentTime = Date.now();
     const touch = event.changedTouches[0];
     const deltaX = touchStartX - touch.pageX;
     const deltaY = touchStartY - touch.pageY;
     
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
+        if (Math.abs(deltaX) > SWIPE_THRESHOLD && currentTime - lastSwipeTime > SWIPE_COOLDOWN) {
             if (deltaX < 0 && playerPosition < 2) { // Swipe right
                 playerPosition++;
                 targetPosition = playerPosition * LANE_WIDTH;
+                touchStartX = touch.pageX; // Reset touch start position
+                lastSwipeTime = currentTime;
             } else if (deltaX > 0 && playerPosition > 0) { // Swipe left
                 playerPosition--;
                 targetPosition = playerPosition * LANE_WIDTH;
+                touchStartX = touch.pageX; // Reset touch start position
+                lastSwipeTime = currentTime;
             }
         }
     } else if (deltaY > SWIPE_THRESHOLD && !jumpAnimation) { // Swipe up
         jump();
+        touchStartY = touch.pageY; // Reset touch start position
     }
 }
 
