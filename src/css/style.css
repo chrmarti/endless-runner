@@ -8,25 +8,21 @@ body {
 
 canvas {
     display: block;
-    background-color: #e0e0e0;
 }
 
 #game-container {
     position: relative;
     width: 100vw;
     height: 100vh;
+    background: transparent;
 }
 
 #gameCanvas {
     display: block;
-    background: linear-gradient(
-        to bottom,
-        #1e90ff 0%,     /* Deeper blue at top */
-        #87CEEB 40%,    /* Sky blue */
-        #E8F3F9 70%,    /* Light blue near horizon */
-        #F5F5F5 100%    /* Almost white at horizon */
-    );
-    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.1); /* Subtle vignette effect */
+    width: 100%;
+    height: 100%;
+    background: none; /* Remove the background from CSS */
+    box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.15); /* Enhanced vignette for depth */
 }
 
 .character {
