@@ -111,7 +111,8 @@ function init() {
     createPlayer();
     createTrack();
 
-    // Initialize high scores display
+    // Show high scores initially
+    document.getElementById('high-scores').style.display = 'block';
     updateHighScoresDisplay();
 }
 
@@ -314,6 +315,7 @@ function gameOver() {
     saveHighScore(score);
     document.getElementById('startButton').style.display = 'block';
     document.getElementById('startButton').textContent = 'Game Over - Try Again';
+    document.getElementById('high-scores').style.display = 'block';
 }
 
 function updateTrains() {
@@ -523,6 +525,10 @@ function startGame() {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
     }
+
+    // Hide high scores and start button during gameplay
+    document.getElementById('high-scores').style.display = 'none';
+    document.getElementById('startButton').style.display = 'none';
 
     // Remove any existing trains
     trains.forEach(train => {

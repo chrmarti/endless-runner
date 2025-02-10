@@ -80,7 +80,7 @@ canvas {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, calc(-50% + 120px)) scale(1);  /* Added scale(1) for consistency */
     padding: 15px 30px;
     font-size: 20px;
     cursor: pointer;
@@ -100,7 +100,7 @@ canvas {
 #startButton:hover,
 #startButton:active {
     background: #45a049;
-    transform: translate(-50%, -50%) scale(1.05);
+    transform: translate(-50%, calc(-50% + 120px)) scale(1.05);  /* Keep the same translate values */
 }
 
 /* Prevent button highlights on mobile */
@@ -118,8 +118,9 @@ canvas {
 
 #high-scores {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     z-index: 1;
@@ -128,6 +129,8 @@ canvas {
     padding: 15px;
     border-radius: 8px;
     min-width: 250px;
+    margin-bottom: 120px; /* Add space above the button */
+    display: none; /* Hidden by default */
 }
 
 #high-scores h2 {
